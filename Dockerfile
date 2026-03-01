@@ -19,8 +19,11 @@ COPY . .
 
 RUN composer install --no-dev --optimize-autoloader
 
+RUN chown -R www-data:www-data /var/www/storage
+RUN chown -R www-data:www-data /var/www/bootstrap/cache
+
 ENV APACHE_DOCUMENT_ROOT=/var/www/public
 
 RUN a2enmod rewrite
 
-CMD php artisan migrate --force && apache2-foreground
+CMD php artisan key:generate && php artisan migrate --force && apache2-foreground
