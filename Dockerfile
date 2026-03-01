@@ -17,8 +17,10 @@ WORKDIR /var/www
 
 COPY . .
 
-RUN composer install --no-interaction --optimize-autoloader
+RUN composer install --no-dev --optimize-autoloader
 
-ENV APACHE_DOCUMENT_ROOT /var/www/public
+ENV APACHE_DOCUMENT_ROOT=/var/www/public
 
 RUN a2enmod rewrite
+
+CMD php artisan migrate --force && apache2-foreground
