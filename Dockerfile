@@ -21,11 +21,10 @@ COPY . .
 
 RUN composer install --no-dev --optimize-autoloader
 
-RUN php artisan key:generate
-
-ENV APACHE_DOCUMENT_ROOT /var/www/public
+ENV APACHE_DOCUMENT_ROOT=/var/www/public
 
 RUN sed -ri -e 's!/var/www/html!/var/www/public!g' /etc/apache2/sites-available/*.conf
+
 RUN a2enmod rewrite
 
-CMD php artisan migrate --force && apache2-foreground
+CMD ["apache2-foreground"]
