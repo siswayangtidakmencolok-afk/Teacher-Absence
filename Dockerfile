@@ -28,6 +28,9 @@ RUN chown -R www-data:www-data /var/www
 
 RUN a2enmod rewrite
 
+RUN a2dismod mpm_event
+RUN a2enmod mpm_prefork
+
 # INI BAGIAN PENTING
 RUN sed -i 's!/var/www/html!/var/www/public!g' /etc/apache2/sites-available/000-default.conf
 
