@@ -26,12 +26,15 @@ RUN php artisan key:generate
 
 RUN chown -R www-data:www-data /var/www
 
+# enable rewrite
 RUN a2enmod rewrite
 
-RUN a2dismod mpm_event
+# disable all mpm then enable prefork
+RUN a2dismod mpm_event || true
+RUN a2dismod mpm_worker || true
 RUN a2enmod mpm_prefork
 
-# INI BAGIAN PENTING
+# set laravel public folder
 RUN sed -i 's!/var/www/html!/var/www/public!g' /etc/apache2/sites-available/000-default.conf
 
-CMD php artisan migrate --force && apache2-foreground
+CMD apache2-foreground
