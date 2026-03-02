@@ -4,9 +4,11 @@ RUN apt-get update && apt-get install -y \
     libpng-dev \
     libjpeg-dev \
     libfreetype6-dev \
+    libzip-dev \
     zip \
     unzip \
-    git
+    git \
+    curl
 
 RUN docker-php-ext-configure gd --with-freetype --with-jpeg \
     && docker-php-ext-install gd pdo pdo_mysql zip
@@ -19,11 +21,11 @@ COPY . .
 
 RUN composer install --no-dev --optimize-autoloader
 
-RUN chown -R www-data:www-data /var/www/storage
-RUN chown -R www-data:www-data /var/www/bootstrap/cache
+RUN php artisan key:generate
 
-ENV APACHE_DOCUMENT_ROOT=/var/www/public
+ENV APACHE_DOCUMENT_ROOT /var/www/public
 
+RUN sed -ri -e 's!/var/www/html!/var/www/public!g' /etc/apache2/sites-available/*.conf
 RUN a2enmod rewrite
 
-CMD php artisan key:generate && php artisan migrate --force && apache2-foreground
+CMD php artisan migrate --force && apache2-foreground
