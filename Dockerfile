@@ -7,8 +7,7 @@ RUN apt-get update && apt-get install -y \
     libzip-dev \
     zip \
     unzip \
-    git \
-    curl
+    git
 
 RUN docker-php-ext-configure gd --with-freetype --with-jpeg \
     && docker-php-ext-install gd pdo pdo_mysql zip
@@ -21,10 +20,15 @@ COPY . .
 
 RUN composer install --no-dev --optimize-autoloader
 
-ENV APACHE_DOCUMENT_ROOT=/var/www/public
+RUN cp .env.example .env
 
-RUN sed -ri -e 's!/var/www/html!/var/www/public!g' /etc/apache2/sites-available/*.conf
+RUN php artisan key:generate
+
+RUN chown -R www-data:www-data /var/www
 
 RUN a2enmod rewrite
 
-CMD ["apache2-foreground"]
+# INI BAGIAN PENTING
+RUN sed -i 's!/var/www/html!/var/www/public!g' /etc/apache2/sites-available/000-default.conf
+
+CMD php artisan migrate --force && apache2-foreground
