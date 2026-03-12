@@ -15,14 +15,20 @@ RUN docker-php-ext-configure gd --with-freetype --with-jpeg \
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 
 WORKDIR /var/www
-
 COPY . .
 
 RUN composer install --no-dev --optimize-autoloader
 
+# Fix MPM conflict — disable event, enable prefork
+RUN a2dismod mpm_event mpm_worker || true
+RUN a2enmod mpm_prefork
+
 RUN a2enmod rewrite
 
-# arahkan apache ke folder public
 RUN sed -i 's!/var/www/html!/var/www/public!g' /etc/apache2/sites-available/000-default.conf
 
-CMD apache2-foreground
+# Set storage permissions
+RUN chown -R www-data:www-data /var/www/storage /var/www/bootstrap/cache \
+    && chmod -R 775 /var/www/storage /var/www/bootstrap/cache
+
+CMD ["apache2-foreground"]
