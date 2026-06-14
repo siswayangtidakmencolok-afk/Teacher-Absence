@@ -27,14 +27,14 @@ class HomeController extends Controller
         $user = Auth::user();
 
         $masuk = "SELECT a.created_at FROM absensis a
-                WHERE created_at >= CURDATE() 
-                AND created_at < CURDATE() + INTERVAL 1 DAY 
+                WHERE created_at >= CURRENT_DATE 
+                AND created_at < CURRENT_DATE + INTERVAL '1 day' 
                 AND a.jenis = 'MASUK'
                 AND a.user_id = {$user->id};";
 
         $pulang = "SELECT a.created_at FROM absensis a
-                WHERE created_at >= CURDATE() 
-                AND created_at < CURDATE() + INTERVAL 1 DAY 
+                WHERE created_at >= CURRENT_DATE 
+                AND created_at < CURRENT_DATE + INTERVAL '1 day' 
                 AND a.jenis = 'PULANG'
                 AND a.user_id = {$user->id};";
 
